@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "debian-openssl-1.1.x", "linux-musl", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  WORKER
+  ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum Order_status {
+  NONE
+  MATCHED
+  PROCESSING
+  DONE
+  CANCELLED
+}
+
+enum Account_status {
+  ACTIVED
+  BLOCKED
+}
+
+model Service {
+  ID       Int                @id @default(autoincrement())
+  user     UsersHasServices[]
+  name     String
+  order    Order?
+  post     Post?
+  creatAt  DateTime           @default(now())
+  updateAt DateTime           @default(now())
+}
+
+model User {
+  ID                               Int                @id @default(autoincrement())
+  default_address                  String?
+  service                          UsersHasServices[]
+  order                            OrderHasUsers[]
+  name                             String
+  password                         String
+  email                            String             @unique
+  long                             Float?
+  lat                              Float?
+  phoneNumber                      String?            @unique
+  gender                           Gender             @default(MALE)
+  age                              Int?               @default(18)
+  avatar                           String?
+  role                             Role               @default(USER)
+  status                           Account_status     @default(ACTIVED)
+  workingMode                      Boolean?           @default(false)
+  post                             Post[]
+  review                           Review?
+  refreshToken                     String?
+  creatAt                          DateTime           @default(now())
+  updateAt                         DateTime           @default(now())
+}
+
+model UsersHasServices {
+  service    Service  @relation(fields: [serviceID], references: [ID])
+  serviceID  Int
+  user       User     @relation(fields: [userID], references: [ID])
+  userID     Int
+  assignedAt DateTime @default(now())
+
+  @@id([userID, serviceID])
+}
+
+model Order {
+  ID        Int             @id @default(autoincrement())
+  user      OrderHasUsers[]
+  address   String
+  service   Service         @relation(fields: [serviceID], references: [ID])
+  serviceID Int             @unique
+  status    Order_status    @default(NONE)
+  amount    Float           @default(0)
+  review    Review[]
+  creatAt   DateTime        @default(now())
+  updateAt  DateTime        @default(now())
+}
+
+model OrderHasUsers {
+  order   Order @relation(fields: [orderID], references: [ID])
+  orderID Int
+  user    User  @relation(fields: [userID], references: [ID])
+  userID  Int
+
+  assignedAt DateTime @default(now())
+
+  @@id([orderID, userID])
+}
+
+model Post {
+  id        Int     @id @default(autoincrement())
+  user      User    @relation(fields: [userID], references: [ID])
+  userID    Int     @unique
+  address   String
+  service   Service @relation(fields: [serviceID], references: [ID])
+  serviceID Int     @unique
+  content   String
+
+  creatAt  DateTime @default(now())
+  updateAt DateTime @updatedAt
+}
+
+model Review {
+  id       Int      @id @default(autoincrement())
+  user     User     @relation(fields: [userID], references: [ID])
+  userID   Int      @unique
+  order    Order    @relation(fields: [orderID], references: [ID])
+  orderID  Int      @unique
+  content  String
+  creatAt  DateTime @default(now())
+  updateAt DateTime @updatedAt
+}
