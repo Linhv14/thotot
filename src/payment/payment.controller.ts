@@ -1,6 +1,6 @@
 import { Body, Controller, Post, ValidationPipe } from '@nestjs/common';
 import { PaymentService } from './payment.service';
-import { MakePaymentDto } from 'shared/make-payment.dto';
+import { MakePaymentDto } from 'shared/dto/make-payment.dto';
 
 @Controller('payments')
 export class PaymentController {

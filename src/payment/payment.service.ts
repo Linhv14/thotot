@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
-import { MakePaymentDto } from 'shared/make-payment.dto';
+import { MakePaymentDto } from 'shared/dto/make-payment.dto';
 
 @Injectable()
 export class PaymentService {
