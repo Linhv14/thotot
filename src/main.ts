@@ -12,6 +12,8 @@ async function bootstrap() {
       { path: 'health', method: RequestMethod.GET },
       { path: 'auth/login', method: RequestMethod.POST },
       { path: 'auth/register', method: RequestMethod.POST },
+      { path: 'auth/logout', method: RequestMethod.GET },
+      { path: 'auth/refresh', method: RequestMethod.GET },
       { path: 'auth/:id/password', method: RequestMethod.PATCH },
       { path: 'auth/:id/block', method: RequestMethod.PATCH },
       { path: 'auth/:id/unblock', method: RequestMethod.PATCH },

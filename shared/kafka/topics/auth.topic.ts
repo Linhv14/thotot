@@ -1,31 +1,41 @@
 export const authTopicsToCreate = [
     {
-      topic: 'register',
+      topic: 'auth.register',
       numPartitions: 3,
       replicationFactor: 1,
     },
     {
-      topic: 'register.reply',
+      topic: 'auth.register.reply',
       numPartitions: 3,
       replicationFactor: 1,
     },
     {
-      topic: 'login',
+      topic: 'auth.login',
       numPartitions: 3,
       replicationFactor: 1,
     },
     {
-      topic: 'login.reply',
+      topic: 'auth.login.reply',
       numPartitions: 3,
       replicationFactor: 1,
     },
     {
-      topic: 'refresh',
+      topic: 'auth.validate',
       numPartitions: 3,
       replicationFactor: 1,
     },
     {
-      topic: 'refresh.repy',
+      topic: 'auth.validate.reply',
+      numPartitions: 3,
+      replicationFactor: 1,
+    },
+    {
+      topic: 'auth.verify',
+      numPartitions: 3,
+      replicationFactor: 1,
+    },
+    {
+      topic: 'auth.verify.reply',
       numPartitions: 3,
       replicationFactor: 1,
     },

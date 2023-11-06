@@ -4,10 +4,11 @@ import { PaymentModule } from '../payment/payments.module';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { AuthService } from 'src/auth/auth.service';
+import { PaymentService } from 'src/payment/payment.service';
 
 @Module({
-  imports: [ConfigModule.forRoot({isGlobal: true}), AuthModule, PaymentModule, PrismaModule],
+  imports: [ConfigModule.forRoot({isGlobal: true}), AuthModule, PaymentModule],
   controllers: [AppController],
   providers: [AppService],
 })

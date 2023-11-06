@@ -1,31 +1,30 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { AccessTokenStrategy } from 'shared/strategy';
-import { RefreshTokenStrategy } from 'shared/strategy/refreshtoken.strategy';
+import { UserController } from './user.controller';
+import { UserService } from './user.service';
 
 @Module({
   imports: [
     ClientsModule.register([
       {
-        name: 'AUTH_MICROSERVICE',
+        name: 'USER_MICROSERVICE',
         transport: Transport.KAFKA,
         options: {
           client: {
-            clientId: 'auth',
+            clientId: 'user',
             brokers: ['localhost:9092'],
           },
           consumer: {
-            groupId: 'auth-consumer',
+            groupId: 'user-consumer',
           },
         },
       },
     ]),
     JwtModule.register({}),
   ],
-  controllers: [AuthController],
-  providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy],
+  controllers: [UserController],
+  providers: [UserService, AccessTokenStrategy ],
 })
 export class AuthModule {}
