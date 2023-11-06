@@ -1,7 +1,7 @@
-import { User } from "@prisma/client";
-import { IPayload } from "shared/interfaces/payload.interface";
 
-export function getPayload(user: User): IPayload {
+import { IPayload } from "../interfaces/payload.interface";
+
+export function getPayload(user: any): IPayload {
     return {
         sub: user.ID,
         email: user.email,

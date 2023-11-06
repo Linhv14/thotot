@@ -4,8 +4,8 @@ import { ClientKafka } from "@nestjs/microservices";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy, ExtractJwt } from "passport-jwt";
 import { catchError, of } from "rxjs";
-import { IPayload } from "shared/interfaces/payload.interface";
-import { kafkaResponseParser } from "shared/kafka/kafka.response";
+import { IPayload } from "../interfaces/payload.interface";
+import { kafkaResponseParser } from "../kafka/kafka.response";
 
 
 @Injectable()

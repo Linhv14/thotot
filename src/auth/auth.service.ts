@@ -2,16 +2,13 @@ import { ForbiddenException, HttpException, HttpStatus, Inject, Injectable, OnMo
 import { ClientKafka } from '@nestjs/microservices';
 import { CreateUserDTO, LoginDTO } from 'shared/dto/auth.dto';
 import { catchError, of } from 'rxjs';
-import { kafkaResponseParser } from 'shared/kafka/kafka.response'
-import { KafkaTopicManager } from 'shared/kafka/kafka.topic';
-import { authTopicsToCreate } from 'shared/kafka/topics/auth.topic';
+import { kafkaResponseParser } from '../../shared/kafka/kafka.response'
+import { KafkaTopicManager } from '../../shared/kafka/kafka.topic';
+import { authTopicsToCreate } from '../../shared/kafka/topics/auth.topic';
 import { JwtService } from '@nestjs/jwt';
-import { getPayload } from 'shared/helper';
-import { IPayload } from 'shared/interfaces/payload.interface';
+import { getPayload } from '../../shared/helper';
+import { IPayload } from '../../shared/interfaces/payload.interface';
 import { ConfigService } from '@nestjs/config';
-import { resolve } from 'path';
-import { rejects } from 'assert';
-
 @Injectable()
 export class AuthService implements OnModuleInit {
   constructor(

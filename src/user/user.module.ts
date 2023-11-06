@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { JwtModule } from '@nestjs/jwt';
-import { AccessTokenStrategy } from 'shared/strategy';
+import { AccessTokenStrategy } from '../../shared/strategy';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 

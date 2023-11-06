@@ -3,8 +3,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
-import { AccessTokenStrategy } from 'shared/strategy';
-import { RefreshTokenStrategy } from 'shared/strategy/refreshtoken.strategy';
+import { AccessTokenStrategy } from '../../shared/strategy';
+import { RefreshTokenStrategy } from '../../shared/strategy/refreshToken.strategy';
 
 @Module({
   imports: [

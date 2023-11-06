@@ -1,10 +1,8 @@
-import { User } from "@prisma/client"
-
 export interface IPayload {
-    sub: User["ID"],
-    email: User["email"],
-    role: User["role"]
-    status: User["status"]
+    sub: number,
+    email: string,
+    role: string,
+    status: string
 }
 
 export interface IAccressToken {
