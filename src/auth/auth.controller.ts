@@ -16,17 +16,28 @@ export class AuthController {
     return await this.authService.register(user);
   }
 
+  @UseGuards(AuthGuard('jwt'))
+  @Get('logout')
+  async logout(@Req() req: any) {
+    const ID = req.user['ID'];
+    console.log("auth controller:::logout", ID)
+    return await this.authService.logout(ID)
+  }
+
   @UseGuards(AuthGuard('jwt-refresh'))
   @Get('refresh')
   refreshTokens(@Req() req: any) {
     const ID = req.user['sub'];
     const refreshToken = req.user['refreshToken'];
+    console.log(ID)
     return this.authService.refreshTokens(ID, refreshToken);
   }
-
+  
   @UseGuards(AuthGuard('jwt'))
   @Get('me')
-  async logout() {
-    return "My profile"
+  profile(@Req() req: any) {
+    const ID = req.user['ID'];
+    console.log(ID)
+    return "My profile: " + ID
   }
 }
