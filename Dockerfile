@@ -1,13 +1,13 @@
 FROM node:21
 
-WORKDIR /linhv/src/app
-
-COPY package*.json ./
+WORKDIR /var/www
 
 RUN npm install
 
-COPY . .
+RUN chown -Rh node:node /var/www
+
+USER node
 
 EXPOSE 3000
 
-CMD [ "npm", "run", "start:dev"]
+CMD ["npm", "run", "start:prod" ]

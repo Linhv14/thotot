@@ -4,7 +4,6 @@ import { KafkaTopicManager } from '../../shared/kafka/kafka.topic-manager';
 import { userTopicsToCreate } from '../../shared/kafka/topics/user.topic';
 import { catchError, of } from 'rxjs';
 import { kafkaResponseParser } from '../../shared/kafka/kafka.response';
-import { CraeteProfileDTO } from 'shared/dto/user.dto';
 
 @Injectable()
 export class UserService implements OnModuleInit, OnModuleDestroy {
@@ -25,9 +24,9 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
     return response
   }
 
-  async createProfile(user: CraeteProfileDTO) {
-    console.log("Creating prifile::::")
-    return this.userClient.emit('user.create-profile', JSON.stringify(user))
+  async update(user: any) {
+    console.log("Updating profile::::")
+    return this.userClient.emit('user.update', JSON.stringify(user))
   }
 
   async onModuleInit() {

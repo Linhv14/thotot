@@ -16,9 +16,16 @@ export class CraeteProfileDTO {
     @IsOptional()
     age: number
 
-    @IsOptional()
-    avatar: string
-
     @IsNotEmpty()
     defaultAddress: string
+}
+
+export class ChangeAvatarDTO {
+    @IsNotEmpty()
+    @IsNumber()
+    ID: number
+
+    @IsNotEmpty()
+    @IsString()
+    avatar: string
 }
