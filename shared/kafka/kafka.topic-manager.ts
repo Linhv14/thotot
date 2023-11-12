@@ -4,10 +4,10 @@ export class KafkaTopicManager {
   private kafka: Kafka;
   private admin: Admin;
 
-  constructor() {
+  constructor(clientId: string, brokers: string[]) {
     this.kafka = new Kafka({
-      clientId: 'auth',
-      brokers: ['localhost:9092'],
+      clientId: clientId,
+      brokers: brokers,
     });
     this.admin = this.kafka.admin();
   }

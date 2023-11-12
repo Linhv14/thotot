@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AccessTokenStrategy } from '../../shared/strategy';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { RefreshTokenStrategy } from 'shared/strategy/refreshToken.strategy';
 
 @Module({
   imports: [
@@ -22,9 +23,8 @@ import { UserService } from './user.service';
         },
       },
     ]),
-    JwtModule.register({}),
   ],
   controllers: [UserController],
-  providers: [UserService, AccessTokenStrategy ],
+  providers: [UserService],
 })
-export class AuthModule {}
+export class UserModule {}

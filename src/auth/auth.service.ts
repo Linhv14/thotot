@@ -1,14 +1,14 @@
-import { ForbiddenException, HttpException, HttpStatus, Inject, Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
-import { CreateUserDTO, LoginDTO } from 'shared/dto/auth.dto';
+import { CreateUserDTO, LoginDTO } from '../../shared/dto/auth.dto';
 import { catchError, of, timeout } from 'rxjs';
 import { kafkaResponseParser } from '../../shared/kafka/kafka.response'
-import { KafkaTopicManager } from '../../shared/kafka/kafka.topic';
 import { authTopicsToCreate } from '../../shared/kafka/topics/auth.topic';
 import { JwtService } from '@nestjs/jwt';
 import { getPayload } from '../../shared/helper';
 import { IPayload } from '../../shared/interfaces/payload.interface';
 import { ConfigService } from '@nestjs/config';
+import { KafkaTopicManager } from '../../shared/kafka/kafka.topic-manager';
 
 @Injectable()
 export class AuthService implements OnModuleInit, OnModuleDestroy {
@@ -22,14 +22,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     const stream = new Promise((resolve, reject) => {
       this.authClient
         .send('auth.login', JSON.stringify(userDTO))
-        .pipe(
-          timeout(5000),
-          catchError((err) => {
-            console.log("TIMEOUT ERROR")
-            console.log(err);
-            throw new HttpException('Request timeout', HttpStatus.REQUEST_TIMEOUT)
-          })
-        )
+        .pipe(catchError(val => of({ error: val.message })))
         .subscribe(message => resolve(message))
     })
     const response = await kafkaResponseParser(stream)
@@ -47,14 +40,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     const stream = new Promise((resolve, reject) => {
       this.authClient
         .send('auth.register', JSON.stringify(userDTO))
-        .pipe(
-          timeout(5000),
-          catchError((err) => {
-            console.log("TIMEOUT ERROR")
-            console.log(err);
-            throw new HttpException('Request timeout', HttpStatus.REQUEST_TIMEOUT)
-          })
-        )
+        .pipe(catchError(val => of({ error: val.message })))
         .subscribe(message => resolve(message))
     })
     const response = await kafkaResponseParser(stream)
@@ -77,14 +63,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     const stream = new Promise((resolve, rejects) => {
       this.authClient
         .send('auth.verify', JSON.stringify({ ID, refreshToken }))
-        .pipe(
-          timeout(5000),
-          catchError((err) => {
-            console.log("TIMEOUT ERROR")
-            console.log(err);
-            throw new HttpException('Request timeout', HttpStatus.REQUEST_TIMEOUT)
-          })
-        )
+        .pipe(catchError(val => of({ error: val.message })))
         .subscribe(message => resolve(message))
     })
     const response = await kafkaResponseParser(stream)
@@ -121,14 +100,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     const stream = new Promise((resolve, reject) => {
       this.authClient
         .send('auth.validate', JSON.stringify(ID))
-        .pipe(
-          timeout(5000),
-          catchError((err) => {
-            console.log("TIMEOUT ERROR")
-            console.log(err);
-            throw new HttpException('Request timeout', HttpStatus.REQUEST_TIMEOUT)
-          })
-        )
+        .pipe(catchError(val => of({ error: val.message })))
         .subscribe(message => resolve(message))
     })
     const response = await kafkaResponseParser(stream)
@@ -139,13 +111,14 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleInit() {
+    console.log("AUTH Initing...")
     this.authClient.subscribeToResponseOf('auth.register')
     this.authClient.subscribeToResponseOf('auth.login')
     this.authClient.subscribeToResponseOf('auth.validate')
     this.authClient.subscribeToResponseOf('auth.verify')
 
     await this.authClient.connect();
-    const topicManager = new KafkaTopicManager();
+    const topicManager = new KafkaTopicManager('auth', ['localhost:9092']);
     topicManager.createTopics(authTopicsToCreate);
   }
 

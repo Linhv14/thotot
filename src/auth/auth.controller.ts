@@ -33,8 +33,7 @@ export class AuthController {
     return this.authService.refreshTokens(ID, refreshToken);
   }
   
-  @UseGuards(AuthGuard('jwt'))
-  @Get('me')
+
   profile(@Req() req: any) {
     const ID = req.user['ID'];
     console.log(ID)
