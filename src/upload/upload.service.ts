@@ -12,7 +12,7 @@ export class UploadService {
     })
     constructor(private readonly configService: ConfigService) { }
 
-    async upload(file: Express.Multer.File, ID: string) {
+    async upload(file: Express.Multer.File, ID: number) {
         const key = `${ID}-${uuidv4()}-${file.originalname}`
         await this.s3Client.send(
             new PutObjectCommand({
@@ -26,9 +26,9 @@ export class UploadService {
         return key
     }
 
-    async delete(ID: string, key: string, ) {
+    async delete(ID: number, key: string, ) {
         if (!key) return
-        if (key.split("-").shift() != ID)
+        if (key.split("-").shift() != JSON.stringify(ID))
             throw new HttpException("Access denied", HttpStatus.FORBIDDEN)
 
         await this.s3Client.send(

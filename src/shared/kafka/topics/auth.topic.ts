@@ -39,4 +39,14 @@ export const authTopicsToCreate = [
       numPartitions: 3,
       replicationFactor: 1,
     },
+    {
+      topic: 'auth.change-password',
+      numPartitions: 3,
+      replicationFactor: 1,
+    },
+    {
+      topic: 'auth.change-password.reply',
+      numPartitions: 3,
+      replicationFactor: 1,
+    },
   ];

@@ -5,6 +5,9 @@ import { UserService } from './user.service';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
+import { AccessTokenStrategy } from 'src/shared/strategy';
+import { JwtModule } from '@nestjs/jwt';
+import { RolesGuard } from 'src/shared/guards';
 
 @Module({
   imports: [
@@ -31,12 +34,14 @@ import { APP_GUARD } from '@nestjs/core';
       }],
       inject: [ConfigService],
     }),
-
   ],
   controllers: [UserController],
   providers: [UserService, {
     provide: APP_GUARD,
-    useClass: ThrottlerGuard,
+    useClass: ThrottlerGuard
+  },{
+    provide: APP_GUARD,
+    useClass: RolesGuard,
   },],
 })
 export class UserModule { }

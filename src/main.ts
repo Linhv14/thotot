@@ -1,7 +1,7 @@
 import { Logger, RequestMethod } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
-import { UserValidationPipe } from 'shared/pips/validation.pip';
+import { UserValidationPipe } from 'src/shared/pips/validation.pip';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,9 +15,7 @@ async function bootstrap() {
       { path: 'auth/register', method: RequestMethod.POST },
       { path: 'auth/logout', method: RequestMethod.GET },
       { path: 'auth/refresh', method: RequestMethod.GET },
-      { path: 'auth/:id/password', method: RequestMethod.PATCH },
-      { path: 'auth/:id/block', method: RequestMethod.PATCH },
-      { path: 'auth/:id/unblock', method: RequestMethod.PATCH },
+      { path: 'auth/change-password', method: RequestMethod.PATCH },
     ],
   });
 

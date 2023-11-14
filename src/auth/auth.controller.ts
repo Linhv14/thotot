@@ -1,25 +1,26 @@
-import { Body, Controller, Post, Get, ValidationPipe, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Post, Get, ValidationPipe, UseGuards, Req, Patch } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDTO, LoginDTO } from '../../shared/dto/auth.dto';
+import { AuthDTO } from 'src/shared/dto/auth.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { ChangePasswordDTO } from 'src/shared/dto/auth.dto';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
   @Post('login')
-  login(@Body(ValidationPipe) user: LoginDTO) {
+  login(@Body(ValidationPipe) user: AuthDTO) {
     return this.authService.login(user);
   }
 
   @Post('register')
-  async register(@Body(ValidationPipe) user: CreateUserDTO) {
+  async register(@Body(ValidationPipe) user: AuthDTO) {
     return await this.authService.register(user);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Get('logout')
   async logout(@Req() req: any) {
-    const ID = req.user['ID'];
+    const ID = parseInt(req.user['ID']);
     console.log("auth controller:::logout", ID)
     return await this.authService.logout(ID)
   }
@@ -27,16 +28,16 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt-refresh'))
   @Get('refresh')
   refreshTokens(@Req() req: any) {
-    const ID = req.user['sub'];
+    const ID = parseInt(req.user['sub']);
     const refreshToken = req.user['refreshToken'];
     console.log(ID)
     return this.authService.refreshTokens(ID, refreshToken);
   }
   
-
-  profile(@Req() req: any) {
-    const ID = req.user['ID'];
-    console.log(ID)
-    return "My profile: " + ID
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('change-password')
+  async changePassword(@Req() req: any, @Body(ValidationPipe) userDTO: ChangePasswordDTO) {
+      userDTO.ID = parseInt(req.user['ID'])
+      return await this.authService.changePassword(userDTO)
   }
 }

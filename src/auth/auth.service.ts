@@ -1,77 +1,57 @@
-import { HttpException, HttpStatus, Inject, Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
-import { CreateUserDTO, LoginDTO } from '../../shared/dto/auth.dto';
-import { catchError, of, timeout } from 'rxjs';
-import { kafkaResponseParser } from '../../shared/kafka/kafka.response'
-import { authTopicsToCreate } from '../../shared/kafka/topics/auth.topic';
+import { AuthDTO } from 'src/shared/dto/auth.dto';
+import { catchError, of } from 'rxjs';
+import { kafkaResponseParser } from 'src/shared/kafka/kafka.response'
+import { authTopicsToCreate } from 'src/shared/kafka/topics/auth.topic';
 import { JwtService } from '@nestjs/jwt';
-import { getPayload } from '../../shared/helper';
-import { IPayload } from '../../shared/interfaces/payload.interface';
+import { getPayload } from 'src/shared/helper';
+import { IPayload } from 'src/shared/interfaces/payload.interface';
 import { ConfigService } from '@nestjs/config';
-import { KafkaTopicManager } from '../../shared/kafka/kafka.topic-manager';
+import { KafkaTopicManager } from 'src/shared/kafka/kafka.topic-manager';
+import { ChangePasswordDTO } from 'src/shared/dto/auth.dto';
 
 @Injectable()
 export class AuthService implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(AuthService.name)
   constructor(
     @Inject('AUTH_MICROSERVICE') private readonly authClient: ClientKafka,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) { }
 
-  async login(userDTO: LoginDTO) {
-    const stream = new Promise((resolve, reject) => {
-      this.authClient
-        .send('auth.login', JSON.stringify(userDTO))
-        .pipe(catchError(val => of({ error: val.message })))
-        .subscribe(message => resolve(message))
-    })
-    const response = await kafkaResponseParser(stream)
-    if (response.hasOwnProperty('error')) {
-      throw new HttpException(response.error, HttpStatus.UNAUTHORIZED)
-    }
+  async login(userDTO: AuthDTO) {
+    this.logger.log("Login:::")
+    const user = await this._sendMessage('auth.login', userDTO, HttpStatus.UNAUTHORIZED)
 
-    const payload = getPayload(response)
-    const tokens = await this._signJwtToken(payload)
-    await this._updateRefreshToken(response.ID, tokens.refreshToken)
+    const tokens = await this._signJwtToken(getPayload(user))
+    await this._updateRefreshToken(user.ID, tokens.refreshToken)
     return tokens
   }
 
-  async register(userDTO: CreateUserDTO) {
-    const stream = new Promise((resolve, reject) => {
-      this.authClient
-        .send('auth.register', JSON.stringify(userDTO))
-        .pipe(catchError(val => of({ error: val.message })))
-        .subscribe(message => resolve(message))
-    })
-    const response = await kafkaResponseParser(stream)
-    if (response.hasOwnProperty('error')) {
-      throw new HttpException(response.error, HttpStatus.BAD_REQUEST)
-    }
-
-    const payload = getPayload(response)
-    const tokens = await this._signJwtToken(payload)
-    await this._updateRefreshToken(response.ID, tokens.refreshToken)
-    return tokens
+  async register(userDTO: AuthDTO) {
+    this.logger.log("Register:::")
+    const user = await this._sendMessage('auth.register', userDTO, HttpStatus.BAD_REQUEST)
+    return user
   }
 
   async logout(ID: number) {
-    console.log("auth servive:::logout", ID)
+    this.logger.log("Logout:::", ID)
     this.authClient.emit('auth.logout', JSON.stringify({ ID, refreshTokens: "" }))
   }
 
   async refreshTokens(ID: number, refreshToken: string) {
-    const stream = new Promise((resolve, rejects) => {
-      this.authClient
-        .send('auth.verify', JSON.stringify({ ID, refreshToken }))
-        .pipe(catchError(val => of({ error: val.message })))
-        .subscribe(message => resolve(message))
-    })
-    const response = await kafkaResponseParser(stream)
-    console.log(response)
-    if (!response.refreshTokenMatches) throw new HttpException("Access denied", HttpStatus.FORBIDDEN)
-    const tokens = await this._signJwtToken(getPayload(response));
-    await this._updateRefreshToken(response.ID, tokens.refreshToken);
+    const user = await this._sendMessage('auth.verify', {ID, refreshToken}, HttpStatus.FORBIDDEN)
+
+    const tokens = await this._signJwtToken(getPayload(user));
+    await this._updateRefreshToken(user.ID, tokens.refreshToken);
     return tokens;
+  }
+
+  async changePassword(userDTO: ChangePasswordDTO) {
+    this.logger.log("Changing password::::")
+    const user = await this._sendMessage('auth.change-password', userDTO, HttpStatus.UNAUTHORIZED)
+    return user
   }
 
   private async _signJwtToken(payload: IPayload) {
@@ -97,17 +77,27 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
   }
 
   async validate(ID: number) {
+    this.logger.log("Validating::::")
+    const user = await this._sendMessage('auth.validate', ID, HttpStatus.UNAUTHORIZED)
+    return user
+  }
+
+  private async _sendMessage(topic: string, data: any, exceptionStatus: HttpStatus) {
     const stream = new Promise((resolve, reject) => {
       this.authClient
-        .send('auth.validate', JSON.stringify(ID))
+        .send(topic, JSON.stringify(data))
         .pipe(catchError(val => of({ error: val.message })))
         .subscribe(message => resolve(message))
     })
     const response = await kafkaResponseParser(stream)
-    console.log(response)
+
     if (response.hasOwnProperty('error'))
-      throw new HttpException(response.error, HttpStatus.UNAUTHORIZED)
+      throw new HttpException(response.error, exceptionStatus)
     return response
+  }
+
+  decode(token: string) {
+    return this.jwtService.decode(token)
   }
 
   async onModuleInit() {
@@ -116,6 +106,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     this.authClient.subscribeToResponseOf('auth.login')
     this.authClient.subscribeToResponseOf('auth.validate')
     this.authClient.subscribeToResponseOf('auth.verify')
+    this.authClient.subscribeToResponseOf('auth.change-password')
 
     await this.authClient.connect();
     const topicManager = new KafkaTopicManager('auth', ['localhost:9092']);

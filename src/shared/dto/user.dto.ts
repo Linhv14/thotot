@@ -1,6 +1,6 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class CraeteProfileDTO {
+export class CreateProfileDTO {
     @IsOptional()
     ID: number
 
