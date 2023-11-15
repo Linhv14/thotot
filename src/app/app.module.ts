@@ -5,9 +5,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from 'src/user/user.module';
 import { UploadModule } from 'src/upload/upload.module';
+import { PostModule } from 'src/post/post.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({isGlobal: true}), AuthModule, UserModule, UploadModule],
+  imports: [
+    ConfigModule.forRoot({isGlobal: true}), 
+    AuthModule, 
+    UserModule,
+    PostModule,
+    UploadModule],
   controllers: [AppController],
   providers: [AppService],
 })

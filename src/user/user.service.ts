@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { KafkaTopicManager } from 'src/shared/kafka/kafka.topic-manager';
-import { userTopicsToCreate } from 'src/shared/kafka/topics/user.topic';
+import { userTopicsToCreate } from 'src/shared/kafka/topics';
 import { catchError, of } from 'rxjs';
 import { kafkaResponseParser } from 'src/shared/kafka/kafka.response';
 

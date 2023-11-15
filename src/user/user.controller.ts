@@ -64,4 +64,15 @@ export class UserController {
         }
         return await this.userService.update(user)
     }
+
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles('user')
+    @Patch('become-worker')
+    async enableWorking(@Req() req: any) {
+        const user = {
+            ID: parseInt(req.user['ID']),
+            role: 'worker'
+        }
+        return await this.userService.update(user)
+    }
 }
