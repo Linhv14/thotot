@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
-import { AuthDTO } from 'src/shared/dto/auth.dto';
+import { LoginDTO, RegisterDTO } from 'src/shared/dto/auth.dto';
 import { catchError, of } from 'rxjs';
 import { kafkaResponseParser } from 'src/shared/kafka/kafka.response'
 import { authTopicsToCreate } from 'src/shared/kafka/topics/auth.topic';
@@ -20,22 +20,22 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     private readonly configService: ConfigService,
   ) { }
 
-  async login(userDTO: AuthDTO) {
+  async login(userDTO: LoginDTO) {
     this.logger.log("Login:::")
     const user = await this._sendMessage('auth.login', userDTO, HttpStatus.UNAUTHORIZED)
 
     const tokens = await this._signJwtToken(getPayload(user))
-    await this._updateRefreshToken(user.ID, tokens.refreshToken)
+    this._updateRefreshToken(user.ID, tokens.refreshToken)
     return tokens
   }
 
-  async register(userDTO: AuthDTO) {
+  async register(userDTO: RegisterDTO) {
     this.logger.log("Register:::")
     const user = await this._sendMessage('auth.register', userDTO, HttpStatus.BAD_REQUEST)
     return user
   }
 
-  async logout(ID: number) {
+  logout(ID: number) {
     this.logger.log("Logout:::", ID)
     this.authClient.emit('auth.logout', JSON.stringify({ ID, refreshTokens: "" }))
   }
@@ -44,7 +44,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     const user = await this._sendMessage('auth.verify', {ID, refreshToken}, HttpStatus.FORBIDDEN)
 
     const tokens = await this._signJwtToken(getPayload(user));
-    await this._updateRefreshToken(user.ID, tokens.refreshToken);
+    this._updateRefreshToken(user.ID, tokens.refreshToken);
     return tokens;
   }
 
@@ -72,13 +72,13 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
-  private async _updateRefreshToken(ID: number, refreshToken: string) {
+  private _updateRefreshToken(ID: number, refreshToken: string) {
     this.authClient.emit('auth.update-token', JSON.stringify({ ID, refreshToken }))
   }
 
   async validate(ID: number) {
     this.logger.log("Validating::::")
-    const user = await this._sendMessage('auth.validate', ID, HttpStatus.UNAUTHORIZED)
+    const user = await this._sendMessage('auth.validate', {ID}, HttpStatus.UNAUTHORIZED)
     return user
   }
 

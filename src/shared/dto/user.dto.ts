@@ -26,6 +26,5 @@ export class ChangeAvatarDTO {
     ID: number
 
     @IsNotEmpty()
-    @IsString()
     avatar: string
 }

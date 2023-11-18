@@ -11,14 +11,14 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
   constructor(@Inject('USER_MICROSERVICE') private readonly userClient: ClientKafka) { }
 
   async getProfile(ID: number) {
-    this.logger.log("User Geting profile::::")
-    const user = await this._sendMessage('user.find-id', ID, HttpStatus.BAD_REQUEST)
+    this.logger.log("User Geting profile::::", ID)
+    const user = await this._sendMessage('user.find-id', {ID}, HttpStatus.BAD_REQUEST)
     return user
   }
 
-  async update(user: any) {
+  update(user: any) {
     this.logger.log("User updating::::")
-    return this.userClient.emit('user.update', JSON.stringify(user))
+    this.userClient.emit('user.update', JSON.stringify(user))
   }
 
   private async _sendMessage(topic: string, data: any, exceptionStatus: HttpStatus) {

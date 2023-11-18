@@ -16,7 +16,9 @@ export class RolesGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.authorization.split(' ')[1];
+    const authToken = request.headers.authorization
+    if (!authToken) { return false }
+    const token = authToken.split(' ')[1];
     const decoded = this.authService.decode(token)
     console.log("Role guard matching::::", roles.includes(decoded['role']))
 

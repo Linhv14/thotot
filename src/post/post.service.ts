@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { catchError, of } from 'rxjs';
+import { CreatePostDTO } from 'src/shared/dto';
 import { kafkaResponseParser } from 'src/shared/kafka/kafka.response';
 import { KafkaTopicManager } from 'src/shared/kafka/kafka.topic-manager';
 import { postTopicsToCreate } from 'src/shared/kafka/topics';
@@ -11,8 +12,8 @@ export class PostService implements OnModuleInit, OnModuleDestroy {
     private readonly logger = new Logger(PostService.name)
     constructor(@Inject('POST_MICROSERVICE') private readonly postClient: ClientKafka) { }
 
-    async create(postDTO: any) {
-        this.logger.log("Post creating:::::")
+    async create(postDTO: CreatePostDTO) {
+        this.logger.log("Creating post::::", JSON.stringify(postDTO))
         const post = await this._sendMessage('post.create', postDTO, HttpStatus.BAD_REQUEST)
 
         return post

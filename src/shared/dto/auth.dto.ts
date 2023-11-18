@@ -1,13 +1,21 @@
-import { IsEmail, IsString, IsNotEmpty, IsOptional, IsNumber } from "class-validator"
+import { IsEmail, IsString, IsNotEmpty, IsOptional, IsNumber, IsStrongPassword } from "class-validator"
 
-export class AuthDTO {
+export class LoginDTO {
   @IsNotEmpty()
-  @IsString()
   @IsEmail()
   email: string;
   
   @IsNotEmpty()
-  @IsString()
+  password: string;
+}
+
+export class RegisterDTO {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+  
+  @IsNotEmpty()
+  @IsStrongPassword()
   password: string;
 }
 
@@ -21,6 +29,6 @@ export class ChangePasswordDTO {
   oldPassword: string
 
   @IsNotEmpty()
-  @IsString()
+  @IsStrongPassword()
   newPassword: string
 }

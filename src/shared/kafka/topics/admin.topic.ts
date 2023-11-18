@@ -1,11 +1,11 @@
 export const adminTopicsToCreate = [
     {
-      topic: 'admin.test',
+      topic: 'admin.create-service',
       numPartitions: 3,
       replicationFactor: 1,
     },
     {
-      topic: 'admin.test.reply',
+      topic: 'admin.create-service.reply',
       numPartitions: 3,
       replicationFactor: 1,
     },

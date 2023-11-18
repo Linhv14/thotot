@@ -4,15 +4,4 @@ import { ForbiddenException, ValidationPipe } from '@nestjs/common';
 // Only accept DTO format
 export const UserValidationPipe = new ValidationPipe({
   whitelist: true,
-  forbidNonWhitelisted: true,
-  transform: true,
-  transformOptions: {
-    enableImplicitConversion: true,
-  },
-  validationError: {
-    target: false,
-  },
-  validateCustomDecorators: true,
-  skipMissingProperties: true,
-  exceptionFactory: () => new ForbiddenException('Can not update fields that do not exist'),
 });

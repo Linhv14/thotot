@@ -1,6 +1,6 @@
 import { Body, Controller, Post, Get, ValidationPipe, UseGuards, Req, Patch } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthDTO } from 'src/shared/dto/auth.dto';
+import { LoginDTO, RegisterDTO } from 'src/shared/dto/auth.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ChangePasswordDTO } from 'src/shared/dto/auth.dto';
 @Controller('auth')
@@ -8,12 +8,12 @@ export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
   @Post('login')
-  login(@Body(ValidationPipe) user: AuthDTO) {
+  login(@Body(ValidationPipe) user: LoginDTO) {
     return this.authService.login(user);
   }
 
   @Post('register')
-  async register(@Body(ValidationPipe) user: AuthDTO) {
+  async register(@Body(ValidationPipe) user: RegisterDTO) {
     return await this.authService.register(user);
   }
 

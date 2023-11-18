@@ -22,9 +22,9 @@ export class UserController {
 
     @UseGuards(AuthGuard('jwt'))
     @Patch('create-profile')
-    async createProfile(@Req() req: any, @Body(ValidationPipe) userDTO: CreateProfileDTO) {
+    createProfile(@Req() req: any, @Body(ValidationPipe) userDTO: CreateProfileDTO) {
         userDTO.ID = parseInt(req.user['ID']);
-        return await this.userService.update(userDTO)
+        return this.userService.update(userDTO)
     }
 
     @UseGuards(AuthGuard('jwt'))
@@ -51,7 +51,7 @@ export class UserController {
             ID,
             avatar: newAvatar
         }
-        return await this.userService.update(userDTO)
+        return this.userService.update(userDTO)
     }
 
     @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -62,17 +62,7 @@ export class UserController {
             ID: parseInt(req.user['ID']),
             role: 'worker'
         }
-        return await this.userService.update(user)
+        return this.userService.update(user)
     }
 
-    @UseGuards(AuthGuard('jwt'), RolesGuard)
-    @Roles('user')
-    @Patch('become-worker')
-    async enableWorking(@Req() req: any) {
-        const user = {
-            ID: parseInt(req.user['ID']),
-            role: 'worker'
-        }
-        return await this.userService.update(user)
-    }
 }

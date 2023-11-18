@@ -6,6 +6,8 @@ import { AppService } from './app.service';
 import { UserModule } from 'src/user/user.module';
 import { UploadModule } from 'src/upload/upload.module';
 import { PostModule } from 'src/post/post.module';
+import { AdminModule } from 'src/admin/admin.module';
+import { WorkerModule } from 'src/worker/worker.module';
 
 @Module({
   imports: [
@@ -13,7 +15,10 @@ import { PostModule } from 'src/post/post.module';
     AuthModule, 
     UserModule,
     PostModule,
-    UploadModule],
+    UploadModule,
+    AdminModule,
+    WorkerModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

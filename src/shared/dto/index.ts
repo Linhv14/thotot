@@ -1,5 +1,5 @@
 export * from './auth.dto'
 export * from './user.dto'
 export * from './worker.dto'
-export * from './admin.dto'
+export * from './service.dto'
 export * from './post.dto'
