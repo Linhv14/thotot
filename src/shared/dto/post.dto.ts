@@ -1,14 +1,22 @@
 import { IsLatitude, IsLongitude, IsNotEmpty, IsOptional } from "class-validator";
-import { type Prisma } from "@prisma/client";
+
 export class CreatePostDTO {
     @IsNotEmpty()
     content: string
 
     @IsNotEmpty()
-    user: Prisma.UserCreateNestedOneWithoutPostInput
+    user: {
+        connect: {
+            ID: number
+        }
+    }
 
     @IsNotEmpty()
-    service: Prisma.ServiceCreateNestedOneWithoutPostInput
+    service: {
+        connect: {
+            ID: number
+        }
+    }
 
     @IsLongitude()
     @IsOptional()
