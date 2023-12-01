@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { catchError, of } from 'rxjs';
+import { UpdateWorkingModeDTO } from 'src/shared/dto';
 import { kafkaResponseParser } from 'src/shared/kafka/kafka.response';
 import { KafkaTopicManager } from 'src/shared/kafka/kafka.topic-manager';
 import { workerTopicsToCreate } from 'src/shared/kafka/topics/worker.topic';
@@ -10,6 +11,9 @@ export class WorkerService implements OnModuleInit, OnModuleDestroy {
     private readonly logger = new Logger(WorkerService.name)
     constructor(@Inject('WORKER_MICROSERVICE') private readonly workerClient: ClientKafka) { }
 
+    toggleWorkingMode(workerDTO: UpdateWorkingModeDTO) {
+        this.workerClient.emit('worker.toggle-working-mode', workerDTO)
+    }
 
     private async _sendMessage(topic: string, data: any, exceptionStatus: HttpStatus) {
         const stream = new Promise((resolve, reject) => {

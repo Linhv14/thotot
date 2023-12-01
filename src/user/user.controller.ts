@@ -1,7 +1,7 @@
 import { Body, Controller, FileTypeValidator, Get, MaxFileSizeValidator, ParseFilePipe, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
-import { ChangeAvatarDTO, CreateProfileDTO } from 'src/shared/dto/user.dto';
+import { ChangeAvatarDTO, CreateProfileDTO, OptionsDTO } from 'src/shared/dto/user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from 'src/upload/upload.service';
 import { RolesGuard } from 'src/shared/guards';
@@ -63,6 +63,13 @@ export class UserController {
             role: 'worker'
         }
         return this.userService.update(user)
+    }
+
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles('admin')
+    @Get('all')
+    async getAllUsers(@Body(ValidationPipe) options: OptionsDTO) {
+        return this.userService.getAll(options)
     }
 
 }

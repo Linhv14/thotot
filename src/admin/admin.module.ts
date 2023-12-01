@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { UserModule } from 'src/user/user.module';
+
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         },
       },
     ]),
+    UserModule
   ],
   providers: [AdminService],
   controllers: [AdminController]

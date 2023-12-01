@@ -43,5 +43,6 @@ import { RolesGuard } from 'src/shared/guards';
     provide: APP_GUARD,
     useClass: RolesGuard,
   },],
+  exports: [UserModule]
 })
 export class UserModule { }

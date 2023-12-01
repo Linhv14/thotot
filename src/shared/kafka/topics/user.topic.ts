@@ -9,4 +9,14 @@ export const userTopicsToCreate = [
       numPartitions: 3,
       replicationFactor: 1,
     },
+    {
+      topic: 'user.get-all',
+      numPartitions: 3,
+      replicationFactor: 1,
+    },
+    {
+      topic: 'user.get-all.reply',
+      numPartitions: 3,
+      replicationFactor: 1,
+    },
   ];

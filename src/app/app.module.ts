@@ -16,10 +16,11 @@ import { WorkerModule } from 'src/worker/worker.module';
     UserModule,
     PostModule,
     UploadModule,
-    AdminModule,
-    WorkerModule
+    WorkerModule,
+    AdminModule
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [UserModule]
 })
 export class AppModule { }

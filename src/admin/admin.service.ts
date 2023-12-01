@@ -9,7 +9,9 @@ import { adminTopicsToCreate } from 'src/shared/kafka/topics/admin.topic';
 @Injectable()
 export class AdminService implements OnModuleInit, OnModuleDestroy {
     private readonly logger = new Logger(AdminService.name)
-    constructor(@Inject('ADMIN_MICROSERVICE') private readonly adminClient: ClientKafka) { }
+    constructor(
+        @Inject('ADMIN_MICROSERVICE') private readonly adminClient: ClientKafka
+    ) { }
 
     async getService() {
         this.logger.log("Getting Service::::")
@@ -31,7 +33,11 @@ export class AdminService implements OnModuleInit, OnModuleDestroy {
 
     deleteService(ID: number) {
         this.logger.log("Deleting Service::::")
-        this.adminClient.emit('admin.delete-service', JSON.stringify({ID}))
+        this.adminClient.emit('admin.delete-service', JSON.stringify({ ID }))
+    }
+
+    async getAllUsers() {
+
     }
 
     private async _sendMessage(topic: string, data: any, exceptionStatus: HttpStatus) {

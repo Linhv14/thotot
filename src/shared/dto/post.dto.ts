@@ -1,11 +1,11 @@
-import { IsLatitude, IsLongitude, IsNotEmpty, IsOptional } from "class-validator";
+import { IsLatitude, IsLongitude, IsNotEmpty, IsNumber, IsOptional } from "class-validator";
 
 export class CreatePostDTO {
     @IsNotEmpty()
     content: string
 
-    @IsNotEmpty()
-    user: {
+    @IsOptional()
+    user?: {
         connect: {
             ID: number
         }

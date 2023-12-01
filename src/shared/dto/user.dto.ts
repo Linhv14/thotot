@@ -28,3 +28,16 @@ export class ChangeAvatarDTO {
     @IsNotEmpty()
     avatar: string
 }
+
+export interface ORDER {
+    DESC: 'desc'
+    ASC: 'asc'
+}
+
+export class OptionsDTO {
+    @IsOptional()
+    orderBy?: {}
+    @IsOptional()
+    @IsNumber()
+    take?: number
+}
