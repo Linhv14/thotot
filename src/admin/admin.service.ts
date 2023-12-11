@@ -1,4 +1,6 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { HttpException, HttpStatus, Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 import { ClientKafka } from '@nestjs/microservices';
 import { catchError, of } from 'rxjs';
 import { CreateServiceDTO, UpdateServiceDTO } from 'src/shared/dto';
@@ -10,35 +12,45 @@ import { adminTopicsToCreate } from 'src/shared/kafka/topics/admin.topic';
 export class AdminService implements OnModuleInit, OnModuleDestroy {
     private readonly logger = new Logger(AdminService.name)
     constructor(
-        @Inject('ADMIN_MICROSERVICE') private readonly adminClient: ClientKafka
+        @Inject('ADMIN_MICROSERVICE') private readonly adminClient: ClientKafka,
+        @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
     ) { }
 
     async getService() {
         this.logger.log("Getting Service::::")
-        const service = await this._sendMessage('admin.get-service', {}, HttpStatus.BAD_REQUEST)
-        return service
+        const cacheData = await this.cacheManager.get('services')
+
+        if (cacheData) {
+            console.log("data from cache")
+            return cacheData
+        }
+
+        const services = await this._sendMessage('admin.get-service', {}, HttpStatus.BAD_REQUEST)
+        console.log("data from db")
+        await this.cacheManager.set('services', services, 30)
+        return services
     }
 
     async createService(serviceDTO: CreateServiceDTO) {
         this.logger.log("Creating Service::::")
         const service = await this._sendMessage('admin.create-service', serviceDTO, HttpStatus.BAD_REQUEST)
+        await this.cacheManager.del('services')
         return service
     }
 
     async updateService(serviceDTO: UpdateServiceDTO) {
         this.logger.log("Updating Service::::")
         const service = await this._sendMessage('admin.update-service', serviceDTO, HttpStatus.BAD_REQUEST)
+        await this.cacheManager.del('services')
         return service
     }
 
-    deleteService(ID: number) {
+    async deleteService(ID: number) {
         this.logger.log("Deleting Service::::")
         this.adminClient.emit('admin.delete-service', JSON.stringify({ ID }))
+        await this.cacheManager.del('services')
     }
 
-    async getAllUsers() {
-
-    }
 
     private async _sendMessage(topic: string, data: any, exceptionStatus: HttpStatus) {
         const stream = new Promise((resolve, reject) => {

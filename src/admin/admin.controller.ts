@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { CreateServiceDTO } from 'src/shared/dto';
 import { RolesGuard } from 'src/shared/guards';
 import { Roles } from 'src/shared/decorator/role.decorator';
 import { AuthGuard } from '@nestjs/passport';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
 @Controller('admin')
 export class AdminController {
@@ -43,12 +44,4 @@ export class AdminController {
         return this.adminService.deleteService(parseInt(ID))
     }
 
-    //**
-    //    USER
-    //**
-
-    @Get('users')
-    async getAllUsers() {
-        return await this.adminService.getAllUsers()
-    }
 }

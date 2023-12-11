@@ -1,4 +1,4 @@
-import { Body, Controller, FileTypeValidator, Get, MaxFileSizeValidator, ParseFilePipe, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, FileTypeValidator, Get, MaxFileSizeValidator, ParseFilePipe, Patch, Req, UploadedFile, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ChangeAvatarDTO, CreateProfileDTO, OptionsDTO } from 'src/shared/dto/user.dto';
@@ -6,18 +6,24 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from 'src/upload/upload.service';
 import { RolesGuard } from 'src/shared/guards';
 import { Roles } from 'src/shared/decorator/role.decorator';
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
+import { Throttle } from '@nestjs/throttler';
+
 
 @Controller('user')
 export class UserController {
     constructor(
         private readonly userService: UserService,
-        private readonly uploadService: UploadService
+        private readonly uploadService: UploadService,
     ) { }
 
+    // @UseInterceptors(CacheInterceptor)
     @UseGuards(AuthGuard('jwt'))
     @Get('me')
     async getProfile(@Req() req: any) {
-        return await this.userService.getProfile(parseInt(req.user['ID']))
+        const ID = parseInt(req.user['ID'])
+        console.log("controller", ID)
+        return await this.userService.getProfile(ID)
     }
 
     @UseGuards(AuthGuard('jwt'))
@@ -65,11 +71,17 @@ export class UserController {
         return this.userService.update(user)
     }
 
+    @Throttle({ default: { limit: 8, ttl: 6000 } }) // miliseconds
     @UseGuards(AuthGuard('jwt'), RolesGuard)
     @Roles('admin')
     @Get('all')
     async getAllUsers(@Body(ValidationPipe) options: OptionsDTO) {
         return this.userService.getAll(options)
+    }
+
+    @Get('find-nearby')
+    async findNearBy() {
+        return this.userService.findNearBy()
     }
 
 }

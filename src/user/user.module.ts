@@ -2,12 +2,6 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { ConfigService } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
-import { AccessTokenStrategy } from 'src/shared/strategy';
-import { JwtModule } from '@nestjs/jwt';
-import { RolesGuard } from 'src/shared/guards';
 
 @Module({
   imports: [
@@ -26,23 +20,8 @@ import { RolesGuard } from 'src/shared/guards';
         },
       },
     ]),
-
-    ThrottlerModule.forRootAsync({
-      useFactory: (configService: ConfigService) => [{
-        ttl: configService.getOrThrow('USER_RATE_TTL'),
-        limit: configService.getOrThrow('USER_RATE_LIMIT'),
-      }],
-      inject: [ConfigService],
-    }),
   ],
   controllers: [UserController],
-  providers: [UserService, {
-    provide: APP_GUARD,
-    useClass: ThrottlerGuard
-  },{
-    provide: APP_GUARD,
-    useClass: RolesGuard,
-  },],
-  exports: [UserModule]
+  providers: [UserService],
 })
 export class UserModule { }

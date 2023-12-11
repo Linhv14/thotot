@@ -36,8 +36,11 @@ export interface ORDER {
 
 export class OptionsDTO {
     @IsOptional()
-    orderBy?: {}
-    @IsOptional()
     @IsNumber()
     take?: number
+    @IsOptional()
+    @IsNumber()
+    skip?: number
+    @IsOptional()
+    orderBy?: {}
 }

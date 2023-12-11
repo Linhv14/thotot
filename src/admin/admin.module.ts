@@ -22,7 +22,6 @@ import { UserModule } from 'src/user/user.module';
         },
       },
     ]),
-    UserModule
   ],
   providers: [AdminService],
   controllers: [AdminController]

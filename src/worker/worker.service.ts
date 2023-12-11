@@ -12,6 +12,7 @@ export class WorkerService implements OnModuleInit, OnModuleDestroy {
     constructor(@Inject('WORKER_MICROSERVICE') private readonly workerClient: ClientKafka) { }
 
     toggleWorkingMode(workerDTO: UpdateWorkingModeDTO) {
+        this.logger.log("Toggle working mode:::")
         this.workerClient.emit('worker.toggle-working-mode', workerDTO)
     }
 
