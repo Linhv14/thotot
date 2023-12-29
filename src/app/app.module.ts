@@ -28,7 +28,7 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
     UserModule,
     // PostModule,
     UploadModule,
-    // WorkerModule,
+    WorkerModule,
     AdminModule,
     RedisModule
   ],

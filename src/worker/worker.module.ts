@@ -1,4 +1,4 @@
-import { Global, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { WorkerService } from './worker.service';
 import { WorkerController } from './worker.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -14,6 +14,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
             clientId: 'worker',
             brokers: ['localhost:9092'],
           },
+          producerOnlyMode: true,
           consumer: {
             groupId: 'worker-consumer',
           },

@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsLatLong, IsLatitude, IsLongitude, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { gender, role } from '../types/user.type';
 
 export class CreateProfileDTO {
     @IsOptional()
@@ -18,6 +19,9 @@ export class CreateProfileDTO {
 
     @IsNotEmpty()
     defaultAddress: string
+
+    @IsOptional()
+    gender: gender
 }
 
 export class ChangeAvatarDTO {
@@ -43,4 +47,24 @@ export class OptionsDTO {
     skip?: number
     @IsOptional()
     orderBy?: {}
+}
+
+export class DeleteUserDTO {
+    @IsNotEmpty()
+    @IsNumber()
+    ID: number
+}
+
+export class ChangeRoleDTO {
+    @IsNotEmpty()
+    role: role
+}
+
+export class CoordinateDTO {
+    @IsNotEmpty()
+    @IsLongitude()
+    long: number
+    @IsNotEmpty()
+    @IsLatitude()
+    lat: number
 }

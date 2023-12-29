@@ -21,7 +21,6 @@ export class AuthController {
   @Get('logout')
   async logout(@Req() req: any) {
     const ID = parseInt(req.user['ID']);
-    console.log("auth controller:::logout", ID)
     return await this.authService.logout(ID)
   }
 
@@ -30,7 +29,6 @@ export class AuthController {
   refreshTokens(@Req() req: any) {
     const ID = parseInt(req.user['sub']);
     const refreshToken = req.user['refreshToken'];
-    console.log(ID)
     return this.authService.refreshTokens(ID, refreshToken);
   }
   

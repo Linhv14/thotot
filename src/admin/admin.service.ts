@@ -6,7 +6,8 @@ import { catchError, of } from 'rxjs';
 import { CreateServiceDTO, UpdateServiceDTO } from 'src/shared/dto';
 import { kafkaResponseParser } from 'src/shared/kafka/kafka.response';
 import { KafkaTopicManager } from 'src/shared/kafka/kafka.topic-manager';
-import { adminTopicsToCreate } from 'src/shared/kafka/topics/admin.topic';
+import { adminTopicsToCreate } from 'src/shared/kafka/topics';
+import { sendMessage } from 'src/shared/kafka/kafka.sender';
 
 @Injectable()
 export class AdminService implements OnModuleInit, OnModuleDestroy {
@@ -25,7 +26,7 @@ export class AdminService implements OnModuleInit, OnModuleDestroy {
             return cacheData
         }
 
-        const services = await this._sendMessage('admin.get-service', {}, HttpStatus.BAD_REQUEST)
+        const services = await sendMessage(this.adminClient, 'admin.get-service', {}, HttpStatus.BAD_REQUEST)
         console.log("data from db")
         await this.cacheManager.set('services', services, 30)
         return services
@@ -33,14 +34,14 @@ export class AdminService implements OnModuleInit, OnModuleDestroy {
 
     async createService(serviceDTO: CreateServiceDTO) {
         this.logger.log("Creating Service::::")
-        const service = await this._sendMessage('admin.create-service', serviceDTO, HttpStatus.BAD_REQUEST)
+        const service = await sendMessage(this.adminClient,'admin.create-service', serviceDTO, HttpStatus.BAD_REQUEST)
         await this.cacheManager.del('services')
         return service
     }
 
     async updateService(serviceDTO: UpdateServiceDTO) {
         this.logger.log("Updating Service::::")
-        const service = await this._sendMessage('admin.update-service', serviceDTO, HttpStatus.BAD_REQUEST)
+        const service = await sendMessage(this.adminClient,'admin.update-service', serviceDTO, HttpStatus.BAD_REQUEST)
         await this.cacheManager.del('services')
         return service
     }
@@ -49,21 +50,6 @@ export class AdminService implements OnModuleInit, OnModuleDestroy {
         this.logger.log("Deleting Service::::")
         this.adminClient.emit('admin.delete-service', JSON.stringify({ ID }))
         await this.cacheManager.del('services')
-    }
-
-
-    private async _sendMessage(topic: string, data: any, exceptionStatus: HttpStatus) {
-        const stream = new Promise((resolve, reject) => {
-            this.adminClient
-                .send(topic, JSON.stringify(data))
-                .pipe(catchError(val => of({ error: val.message })))
-                .subscribe(message => resolve(message))
-        })
-        const response = await kafkaResponseParser(stream)
-
-        if (response.hasOwnProperty('error'))
-            throw new HttpException(response.error, exceptionStatus)
-        return response
     }
 
     async onModuleInit() {

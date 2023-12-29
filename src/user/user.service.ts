@@ -4,7 +4,7 @@ import { KafkaTopicManager } from 'src/shared/kafka/kafka.topic-manager';
 import { userTopicsToCreate } from 'src/shared/kafka/topics';
 import { catchError, of } from 'rxjs';
 import { kafkaResponseParser } from 'src/shared/kafka/kafka.response';
-import { OptionsDTO } from 'src/shared/dto';
+import { ChangeRoleDTO, CoordinateDTO, DeleteUserDTO, OptionsDTO } from 'src/shared/dto';
 
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -30,7 +30,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
   }
 
   async getProfile(ID: number) {
-    console.log(ID.toString())
     this.logger.log("User Getting profile::::", ID)
     const cacheData = await this.cacheManager.get(ID.toString())
 
@@ -42,7 +41,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
     const user = await this._sendMessage('user.find-id', { ID })
     console.log("data from db")
     await this.cacheManager.set(ID.toString(), user, 60)
-    
+
     return user
   }
 
@@ -52,10 +51,22 @@ export class UserService implements OnModuleInit, OnModuleDestroy {
     await this.cacheManager.del(user.ID.toString())
   }
 
+  async deleteUser(userDTO: DeleteUserDTO) {
+    this.logger.log("User deleting::::")
+    this.userClient.emit('user.delete', JSON.stringify(userDTO))
+    await this.cacheManager.del(userDTO.ID.toString())
+  }
+
+  async changeRole(userDTO: ChangeRoleDTO, ID: number) {
+    this.logger.log("User changing role::::",)
+    this.userClient.emit('user.update', JSON.stringify(userDTO))
+    await this.cacheManager.del(ID.toString())
+  }
+
   async findNearBy() {
     this.logger.log("User finding near by::::",)
-    const woker = await this._sendMessage('user.find-nearby', {})
-    return woker
+    const worker = await this._sendMessage('user.find-nearby', {})
+    return worker
   }
 
   private async _sendMessage(topic: string, data: any, exceptionStatus: HttpStatus = HttpStatus.BAD_REQUEST) {
